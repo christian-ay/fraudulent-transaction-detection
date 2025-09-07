@@ -84,33 +84,11 @@ function predictFraud(features: any): FraudDetectionResult {
   fraudProb += (Math.random() - 0.5) * 0.1
   fraudProb = Math.min(Math.max(fraudProb, 0.01), 0.99)
 
-  // Generate individual model predictions
   const modelPredictions = {
     "Random Forest": Math.min(Math.max(fraudProb + (Math.random() - 0.5) * 0.1, 0.01), 0.99),
-    "Gradient Boosting": Math.min(Math.max(fraudProb + (Math.random() - 0.5) * 0.08, 0.01), 0.99),
-    "Logistic Regression": Math.min(Math.max(fraudProb + (Math.random() - 0.5) * 0.12, 0.01), 0.99),
-    SVM: Math.min(Math.max(fraudProb + (Math.random() - 0.5) * 0.15, 0.01), 0.99),
-    "Decision Tree": Math.min(Math.max(fraudProb + (Math.random() - 0.5) * 0.2, 0.01), 0.99),
-    AdaBoost: Math.min(Math.max(fraudProb + (Math.random() - 0.5) * 0.18, 0.01), 0.99),
-    "Naive Bayes": Math.min(Math.max(fraudProb + (Math.random() - 0.5) * 0.25, 0.01), 0.99),
-    "K-Nearest Neighbors": Math.min(Math.max(fraudProb + (Math.random() - 0.5) * 0.3, 0.01), 0.99),
   }
 
-  // Calculate ensemble prediction (weighted average)
-  const weights = {
-    "Random Forest": 0.2,
-    "Gradient Boosting": 0.18,
-    "Logistic Regression": 0.15,
-    SVM: 0.12,
-    "Decision Tree": 0.1,
-    AdaBoost: 0.1,
-    "Naive Bayes": 0.08,
-    "K-Nearest Neighbors": 0.07,
-  }
-
-  fraudProb = Object.entries(modelPredictions).reduce((sum, [model, prob]) => {
-    return sum + prob * weights[model as keyof typeof weights]
-  }, 0)
+  fraudProb = modelPredictions["Random Forest"]
 
   // Identify risk factors
   if (Number.parseFloat(features.amount_log) > 6) {
@@ -141,11 +119,7 @@ function predictFraud(features: any): FraudDetectionResult {
     riskFactors.push("Cash-out transaction type")
   }
 
-  // Calculate confidence based on model agreement
-  const predictions = Object.values(modelPredictions)
-  const mean = predictions.reduce((a, b) => a + b, 0) / predictions.length
-  const variance = predictions.reduce((sum, pred) => sum + Math.pow(pred - mean, 2), 0) / predictions.length
-  const confidence = Math.max(0.5, 1 - Math.sqrt(variance) * 2)
+  const confidence = 0.85
 
   const isFraud = fraudProb > 0.5
   const riskScore = Math.round(fraudProb * 100)

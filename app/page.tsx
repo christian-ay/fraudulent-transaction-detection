@@ -4,14 +4,12 @@ import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { AlertCircle, Shield, TrendingUp, Database, Brain, BarChart3, Zap } from "lucide-react"
+import { AlertCircle, Shield, TrendingUp, Database, BarChart3, Zap } from "lucide-react"
 import Link from "next/link"
 
 export default function FraudDetectionHome() {
   const [isGeneratingData, setIsGeneratingData] = useState(false)
-  const [isTrainingModels, setIsTrainingModels] = useState(false)
   const [dataResult, setDataResult] = useState<any>(null)
-  const [modelResult, setModelResult] = useState<any>(null)
   const [error, setError] = useState<string | null>(null)
 
   const handleGenerateData = async () => {
@@ -31,26 +29,6 @@ export default function FraudDetectionHome() {
       setError(`Data generation failed: ${error instanceof Error ? error.message : "Unknown error"}`)
     } finally {
       setIsGeneratingData(false)
-    }
-  }
-
-  const handleTrainModels = async () => {
-    setIsTrainingModels(true)
-    setError(null)
-    try {
-      const response = await fetch("/api/train-models", { method: "POST" })
-      if (!response.ok) {
-        const errorText = await response.text()
-        throw new Error(`HTTP ${response.status}: ${errorText}`)
-      }
-      const result = await response.json()
-      console.log("Model training result:", result)
-      setModelResult(result)
-    } catch (error) {
-      console.error("Error training models:", error)
-      setError(`Model training failed: ${error instanceof Error ? error.message : "Unknown error"}`)
-    } finally {
-      setIsTrainingModels(false)
     }
   }
 
@@ -99,25 +77,8 @@ export default function FraudDetectionHome() {
           </Card>
         )}
 
-        {modelResult && (
-          <Card className="mb-8 border-blue-200 bg-blue-50 dark:bg-blue-900/20">
-            <CardContent className="p-6">
-              <div className="flex items-start">
-                <Brain className="h-5 w-5 text-blue-600 mr-3 mt-0.5" />
-                <div>
-                  <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-1">Model Training Complete</h3>
-                  <p className="text-sm text-blue-800 dark:text-blue-200">
-                    Trained {modelResult.data?.models?.length} models with{" "}
-                    {Math.round(modelResult.data?.ensemble_metrics?.accuracy * 100)}% average accuracy
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
         {/* System Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card className="border-l-4 border-l-blue-500">
             <CardHeader className="pb-3">
               <div className="flex items-center">
@@ -131,28 +92,6 @@ export default function FraudDetectionHome() {
               </p>
               <Button onClick={handleGenerateData} disabled={isGeneratingData} className="w-full">
                 {isGeneratingData ? "Generating..." : "Generate Data"}
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="border-l-4 border-l-green-500">
-            <CardHeader className="pb-3">
-              <div className="flex items-center">
-                <Brain className="h-6 w-6 text-green-600 mr-2" />
-                <CardTitle className="text-lg">Model Training</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-                Train multiple ML models: Random Forest, SVM, Logistic Regression, Gradient Boosting
-              </p>
-              <Button
-                onClick={handleTrainModels}
-                disabled={isTrainingModels}
-                className="w-full bg-transparent"
-                variant="outline"
-              >
-                {isTrainingModels ? "Training..." : "Train Models"}
               </Button>
             </CardContent>
           </Card>
@@ -236,8 +175,8 @@ export default function FraudDetectionHome() {
               </div>
 
               <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                <h3 className="font-semibold text-green-900 dark:text-green-100 mb-2">Multiple Models</h3>
-                <p className="text-sm text-green-700 dark:text-green-300">Ensemble of traditional ML algorithms</p>
+                <h3 className="font-semibold text-green-900 dark:text-green-100 mb-2">Random Forest Model</h3>
+                <p className="text-sm text-green-700 dark:text-green-300">Optimized Random Forest algorithm</p>
               </div>
 
               <div className="text-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
@@ -322,8 +261,8 @@ export default function FraudDetectionHome() {
               <div>
                 <h3 className="font-semibold text-orange-900 dark:text-orange-100 mb-1">Getting Started</h3>
                 <p className="text-sm text-orange-800 dark:text-orange-200">
-                  Begin by generating synthetic transaction data, then train the machine learning models. Once complete,
-                  you can test the real-time fraud detection API and explore the comprehensive analytics dashboard.
+                  Begin by generating synthetic transaction data to populate the system. Once complete, you can test the
+                  real-time fraud detection API and explore the comprehensive analytics dashboard.
                 </p>
               </div>
             </div>

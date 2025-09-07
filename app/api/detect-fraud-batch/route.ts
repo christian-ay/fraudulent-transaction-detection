@@ -60,31 +60,16 @@ function predictFraud(features: any) {
 
   const modelPredictions = {
     "Random Forest": Math.min(Math.max(fraudProb + (Math.random() - 0.5) * 0.1, 0.01), 0.99),
-    "Gradient Boosting": Math.min(Math.max(fraudProb + (Math.random() - 0.5) * 0.08, 0.01), 0.99),
-    "Logistic Regression": Math.min(Math.max(fraudProb + (Math.random() - 0.5) * 0.12, 0.01), 0.99),
-    SVM: Math.min(Math.max(fraudProb + (Math.random() - 0.5) * 0.15, 0.01), 0.99),
   }
 
-  const weights = {
-    "Random Forest": 0.3,
-    "Gradient Boosting": 0.25,
-    "Logistic Regression": 0.25,
-    SVM: 0.2,
-  }
-
-  fraudProb = Object.entries(modelPredictions).reduce((sum, [model, prob]) => {
-    return sum + prob * weights[model as keyof typeof weights]
-  }, 0)
+  fraudProb = modelPredictions["Random Forest"]
 
   if (Number.parseFloat(features.amount_log) > 6) riskFactors.push("High transaction amount")
   if (features.is_cross_border) riskFactors.push("Cross-border transaction")
   if (features.is_night) riskFactors.push("Unusual time (night hours)")
   if (features.user_transaction_count < 5) riskFactors.push("New user with limited history")
 
-  const predictions = Object.values(modelPredictions)
-  const mean = predictions.reduce((a, b) => a + b, 0) / predictions.length
-  const variance = predictions.reduce((sum, pred) => sum + Math.pow(pred - mean, 2), 0) / predictions.length
-  const confidence = Math.max(0.5, 1 - Math.sqrt(variance) * 2)
+  const confidence = 0.85
 
   const isFraud = fraudProb > 0.5
   const riskScore = Math.round(fraudProb * 100)
